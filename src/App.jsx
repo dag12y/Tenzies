@@ -4,10 +4,14 @@ import {nanoid} from 'nanoid'
 import ReactConfetti from "react-confetti"
 
 function App() {
-  const [dice,setDice]=useState(generateAllNewDIce())
+  const [dice,setDice]=useState(()=>generateAllNewDIce())
 
   const gameWon = dice.every(die => die.isHeld) && 
         dice.every(die => die.value === dice[0].value)
+  const [history,setHistory]=useState({currentScore:0,
+                                        highScore:0
+                                        
+  })
 
   function generateAllNewDIce(){
     return new Array(10)
@@ -28,15 +32,20 @@ function App() {
   }
 
   function rollDice(){
-
-    setDice(oldDice=>
-      oldDice.map(die=>
-        die.isHeld ?
-        die : 
-        {...die,value:Math.ceil(Math.random()*6)}
-      )
-    )
+    !gameWon ?
+      setDice(oldDice=>
+        oldDice.map(die=>
+          die.isHeld ?
+          die : 
+          {...die,value:Math.ceil(Math.random()*6)}
+        )
+      ):
+      setDice(generateAllNewDIce())
+    
   }
+
+  
+
   const diecElements =dice.map(dieObj=>
   <Die key={dieObj.id}
       value={dieObj.value}
@@ -55,6 +64,10 @@ function App() {
       <button className='roll-dice' onClick={rollDice}>
         {gameWon ? "New Game" : "Roll"}
       </button>
+      <div className="history">
+        <span className="current-score">current-score : {history.currentScore}</span>
+        <span className="high-score">high-score : {history.highScore}</span>
+      </div>
     </main>
   )
 }
